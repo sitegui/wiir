@@ -1,0 +1,20 @@
+{
+  "name": "wiir",
+  "version": "0.0.1",
+  "author": "Guilherme Souza <sitegui@sitegui.com.br>",
+  "description": "Show who is in the house, based on the list of connected people of the local router",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sitegui/wiir"
+  },
+  "dependencies": {
+    "async-protocol": "~0.2.8"
+  },
+  "engines": {
+    "node": ">=0.10"
+  },
+  "scripts": {
+    "start": "forever start -l forever.log -a -o out.log -e err.log index.js",
+    "test": "exit 1"
+  }
+}
