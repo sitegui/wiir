@@ -1,0 +1,27 @@
+h2 > label {
+	font-size: medium;
+	padding-left: 50px;
+	font-weight: normal;
+}
+#people:not(.show-all) > .person.off,
+#unknown:not(.show-all) > .device.off {
+	display: none;
+}
+.off {
+	color: gray;
+}
+.person > h3,
+.device > h3 {
+	cursor: pointer;
+}
+.person:not(.show) > p,
+.device:not(.show) > p {
+	display: none;
+}
+img {
+	vertical-align: middle;
+	margin: 0 5px;
+}
+h3 > span {
+	margin-left: 25px;
+}
