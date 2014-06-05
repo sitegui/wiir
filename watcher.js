@@ -24,6 +24,7 @@ module.exports.getInfo = function () {
 }
 
 // Save a unknown peer as a person
+// Return true in case of success, false otherwise
 module.exports.savePerson = function (mac, name, type) {
 	var i, person
 	
@@ -35,16 +36,15 @@ module.exports.savePerson = function (mac, name, type) {
 			break
 		}
 	
-	if (!person)
-		return console.error('Could not find a person with mac: '+mac)
-	if (!~types.indexOf(type))
-		return console.error('Invalid type: '+type)
+	if (!person || !~types.indexOf(type))
+		return false
 	
 	person.device = person.name
 	person.name = name
 	person.type = type
 	people.push(person)
 	save()
+	return true
 }
 
 // Load people values from people.json and unknown.json
