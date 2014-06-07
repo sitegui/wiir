@@ -1,10 +1,12 @@
 'use strict'
 
 var watcher = require('./watcher')
+var https = require('https')
 var http = require('http')
 var config = require('./config.js')
 var express = require('express')
 var bodyParser = require('body-parser')
+var fs = require('fs')
 
 watcher.init()
 
@@ -51,4 +53,15 @@ app.post('/api/savePerson', function (req, res) {
 		res.error()
 })
 
-http.createServer(app).listen(config.port)
+if (config.key)
+	https.createServer({
+		key: fs.readFileSync(config.key),
+		cert: fs.readFileSync(config.cert)
+	}, app).listen(config.port, function () {
+		console.log('Listening on port '+config.port+' (https enabled)')
+	})
+else
+	http.createServer(app).listen(config.port, function () {
+		console.log('Listening on port '+config.port)
+		console.log('[WARN] https disabled')
+	})

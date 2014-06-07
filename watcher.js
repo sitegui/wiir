@@ -73,6 +73,7 @@ function init() {
 
 // Save current data in people.json and unknown.json
 function save() {
+	console.log('Updated')
 	fs.writeFileSync('people.json', JSON.stringify(people, null, '\t'))
 	fs.writeFileSync('unknown.json', JSON.stringify(unknown, null, '\t'))
 }
