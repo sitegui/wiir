@@ -1,27 +1,107 @@
-h2 > label {
-	font-size: medium;
-	padding-left: 50px;
-	font-weight: normal;
+/* Global */
+* {
+	box-sizing: border-box;
 }
-#people:not(.show-all) > .person.off,
-#unknown:not(.show-all) > .device.off {
-	display: none;
-}
-.off {
-	color: gray;
-}
-.person > h3,
-.device > h3 {
-	cursor: pointer;
-}
-.person:not(.show) > p,
-.device:not(.show) > p {
-	display: none;
+html, body {
+	margin: 0;
+	background-color: #EEE;
 }
 img {
 	vertical-align: middle;
 	margin: 0 5px;
 }
-h3 > span {
-	margin-left: 25px;
+h2 {
+	padding: 5px;
+	margin: 0;
+}
+
+/* General */
+h2 + .person {
+	border-top: thin gray solid;
+}
+.person {
+	border-bottom: thin gray solid;
+	padding: 5px;
+}
+.person > .name {
+	font-size: larger;
+	font-weight: bold;
+	padding: 5px;
+}
+.device {
+	background-repeat: no-repeat;
+	background-position: 25px center;
+	min-height: 36px;
+	padding: 5px 0 5px 65px;
+}
+.last-seen {
+	font-size: smaller;
+	color: #333;
+	display: block;
+}
+
+/* Online */
+h2.people {
+	background-color: #CCF;
+}
+
+/* Offline */
+h2.offline {
+	background-color: #CCC;
+}
+.person > .last-seen {
+	padding-left: 25px;
+}
+
+/* Unknown */
+h2.unknown {
+	background-color: #FCC;
+}
+.mac {
+	color: #333;
+	font-family: monospace;
+	font-size: smaller;
+	padding-left: 25px;
+}
+
+/* Icons */
+.icon-computer-on,
+.icon-computer-off,
+.icon-ipad-on,
+.icon-ipad-off,
+.icon-iphone-on,
+.icon-iphone-off,
+.icon-phone-on,
+.icon-phone-off {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: contain;
+	margin-left: 5px;
+}
+.icon-computer-on, .computer-on {
+	background-image: url(img/computer_on.png);
+}
+.icon-computer-off, .computer-off {
+	background-image: url(img/computer_off.png);
+}
+.icon-ipad-on, .ipad-on {
+	background-image: url(img/ipad_on.png);
+}
+.icon-ipad-off, .ipad-off {
+	background-image: url(img/ipad_off.png);
+}
+.icon-iphone-on, .iphone-on {
+	background-image: url(img/iphone_on.png);
+}
+.icon-iphone-off, .iphone-off {
+	background-image: url(img/iphone_off.png);
+}
+.icon-phone-on, .phone-on {
+	background-image: url(img/phone_on.png);
+}
+.icon-phone-off, .phone-off {
+	background-image: url(img/phone_off.png);
 }

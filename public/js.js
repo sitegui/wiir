@@ -1,128 +1,269 @@
 'use strict'
 
+var deviceTypeMap = {
+	pc: 'computer',
+	mac: 'computer',
+	iphone: 'iphone', 
+	android: 'phone',
+	ipad: 'ipad'
+}
+
+// Store the password globally
 var password
 
 addEventListener('load', function () {
-	password = prompt('Please enter the password')
+	password = localStorage.getItem('wiir-password')
 	
-	setTimeout(getInfo, 60e3)
-	getInfo()
+	// Interface init
+	get('login').onsubmit = function (event) {
+		event.preventDefault()
+		password = get('password').value
+		if (get('remember').checked)
+			localStorage.setItem('wiir-password', password)
+		init()
+	}
 	
-	document.getElementById('show-all-people').onchange = function () {
-		var div = document.getElementById('people')
-		this.checked ? div.classList.add('show-all') : div.classList.remove('show-all')
-	}
-	document.getElementById('show-all-unknown').onchange = function () {
-		var div = document.getElementById('unknown')
-		this.checked ? div.classList.add('show-all') : div.classList.remove('show-all')
-	}
+	if (password)
+		init()
 })
 
-// Load peer info from the server
-function getInfo() {
+// Alias for document.getElementById
+function get(id) {
+	return document.getElementById(id)
+}
+
+// Alias for document.createElement
+function create(tag) {
+	return document.createElement(tag)
+}
+
+// Start the interface
+// Called after password has been set
+function init() {
+	get('login').style.display = 'none'
+	
 	request('getInfo', {}, function (err, data) {
-		if (err)
-			return alert('Login error')
+		if (err) {
+			return alert('Request error')
+		}
 		
-		populatePeople(data.people)
-		populateUnknown(data.unknown)
+		update(data)
 	})
 }
 
-function populatePeople(data) {
-	var el = document.getElementById('people')
-	el.innerHTML = ''
-	
-	// Group by person name
+// Update the interface with the received data
+// {name: string, type: string, mac: string, device: string, on: bool, lastSeen: Date?}
+// {name: string, mac: string, on: bool, lastSeen: Date?}
+function update(data) {
+	// Extract people data
 	var people = {}
-	data.forEach(function (person) {
-		if (!(person.name in people)) {
-			people[person.name] = []
-			people[person.name].on = false
-		}
-		people[person.name].push(person)
-		people[person.name].on = people[person.name].on || person.on
+	
+	data.people.forEach(function (person) {
+		var person2
+		
+		if (!(person.name in people))
+			people[person.name] = {
+				name: person.name,
+				devices: [],
+				on: false,
+				lastSeen: ''
+			}
+		
+		person2 = people[person.name]
+		person2.devices.push({
+			type: person.type,
+			mac: person.mac,
+			name: person.device,
+			on: person.on,
+			lastSeen: person.lastSeen
+		})
+		person2.on = person2.on || person.on
+		if (person.lastSeen > person2.lastSeen)
+			person2.lastSeen = person.lastSeen
 	})
 	
-	Object.keys(people).sort().forEach(function (name) {
-		el.appendChild(getPersonDiv(name, people[name]))
-	})
-}
-
-function getPersonDiv(name, devices) {
-	var div = document.createElement('div')
-	var h3 = document.createElement('h3')
-	var devicesSpan = document.createElement('span')
-	h3.textContent = name
-	h3.appendChild(devicesSpan)
-	div.classList.add('person')
-	if (!devices.on)
-		div.classList.add('off')
-	div.appendChild(h3)
-	div.onclick = function () {
-		this.classList.toggle('show')
-	}
-
-	devices.sort(function (a, b) {
+	// Divide people in two groups (online and offline)
+	var online = [], offline = [], name
+	var sortOn = function (a, b) {
 		return b.on-a.on
-	}).forEach(function (device) {
-		var p = document.createElement('p'), span
-		p.appendChild(getImage(device))
-		p.appendChild(document.createTextNode(device.device))
-		if (!device.on) {
-			p.classList.add('off')
-			span = document.createElement('span')
-			span.textContent = device.lastSeen
-			p.appendChild(span)
-		}
-		div.appendChild(p)
-		devicesSpan.appendChild(getImage(device))
+	}
+	for (name in people) {
+		people[name].devices.sort(sortOn)
+		if (people[name].on)
+			online.push(people[name])
+		else
+			offline.push(people[name])
+	}
+	
+	// Sort both arrays
+	online.sort(function (a, b) {
+		return a.name>b.name ? 1 : -1
+	})
+	offline.sort(function (a, b) {
+		return a.lastSeen<b.lastSeen ? 1 : -1
 	})
 	
-	return div
+	// Extract unknown data
+	var unknown = data.unknown.filter(function (each) {
+		return each.on
+	}).sort(function (a, b) {
+		return a.name>b.name ? 1 : -1
+	})
+	
+	updateOnline(online)
+	updateOffline(offline)
+	updateUnknown(unknown)
 }
 
-function populateUnknown(data) {
-	var el = document.getElementById('unknown')
+// Visually update the list of online people
+function updateOnline(people) {
+	var el = get('peopleList')
 	el.innerHTML = ''
 	
-	data.sort(function (a, b) {
-		return a.name>b.name ? 1 : -1
-	}).forEach(function (device) {
-		var span, div, h3, p
-		div = document.createElement('div')
-		h3 = document.createElement('h3')
-		p = document.createElement('p')
+	people.forEach(function (person) {
+		var personEl = create('div')
+		personEl.className = 'person'
+		el.appendChild(personEl)
 		
-		div.classList.add('device')
-		div.onclick = function () {
-			this.classList.toggle('show')
-		}
-		if (!device.on)
-			div.classList.add('off')
-		div.appendChild(h3)
-		div.appendChild(p)
-		h3.textContent = device.name
-		p.textContent = device.mac
+		var nameEl = create('div')
+		nameEl.className = 'name'
+		nameEl.textContent = person.name
+		personEl.appendChild(nameEl)
 		
-		if (!device.on) {
-			span = document.createElement('span')
-			span.textContent = device.lastSeen
-			p.appendChild(span)
-		}
-		
-		el.appendChild(div)
+		person.devices.forEach(function (device) {
+			var deviceEl = create('div'), spanEl
+			deviceEl.className = 'device'
+			deviceEl.classList.add(deviceTypeMap[device.type]+'-'+(device.on ? 'on' : 'off'))
+			deviceEl.textContent = device.name
+			
+			if (device.lastSeen && !device.on) {
+				spanEl = create('span')
+				spanEl.className = 'last-seen'
+				spanEl.textContent = lastSeenEnhance(device.lastSeen)
+				deviceEl.appendChild(spanEl)
+			}
+			
+			personEl.appendChild(deviceEl)
+		})
 	})
 }
 
-function getImage(device) {
-	var img = new Image
-	var src = device.type=='pc' || device.type=='mac' ? 'pc' : 'mobile'
-	src += device.on ? '_on.png' : '_off.png'
-	img.src = src
-	return img
+// Visually update the list of offline people
+function updateOffline(people) {
+	var el = get('offlineList')
+	el.innerHTML = ''
+	
+	people.forEach(function (person) {
+		var personEl = create('div')
+		personEl.className = 'person'
+		el.appendChild(personEl)
+		
+		var nameEl = create('div')
+		nameEl.className = 'name'
+		nameEl.textContent = person.name
+		personEl.appendChild(nameEl)
+		
+		person.devices.forEach(function (device) {
+			var deviceEl = create('span')
+			deviceEl.className = 'icon-'+deviceTypeMap[device.type]+'-off'
+			nameEl.appendChild(deviceEl)
+		})
+		
+		if (person.lastSeen){
+			var lastSeenEl = create('div')
+			lastSeenEl.className = 'last-seen'
+			lastSeenEl.textContent = lastSeenEnhance(person.lastSeen)
+			personEl.appendChild(lastSeenEl)
+		}
+	})
 }
 
+// Visually update the list of offline people
+function updateUnknown(devices) {
+	var el = get('unknownList')
+	el.innerHTML = ''
+	
+	devices.forEach(function (device) {
+		var deviceEl = create('div')
+		deviceEl.className = 'person'
+		el.appendChild(deviceEl)
+		
+		var nameEl = create('div')
+		nameEl.className = 'name'
+		nameEl.textContent = device.name
+		deviceEl.appendChild(nameEl)
+		
+		var macEl = create('div')
+		macEl.className = 'mac'
+		macEl.textContent = device.mac
+		deviceEl.appendChild(macEl)
+	})
+}
+
+//Returns a user friendly string of the time the user was offline
+//lastSeen is a string on format yyyy-mm-ddThh:mm:ss
+function lastSeenEnhance(lastSeen){
+
+	var date = new Date(lastSeen)
+	var diff = Date.now() - date.getTime()
+	var minutes = Math.floor(diff /= 1000*60)%60
+	var hours = Math.floor(diff /= 60)%24
+	var days = Math.floor(diff /= 24)%30
+	var months = Math.floor(diff /= 30.4345)%12
+	var years = Math.floor(diff /= 12)
+	var string = 'Last seen'
+	
+	if (years >= 1) return 'Last seen more than 1 year ago'
+	
+	if (months >= 1){
+		if (months == 1) string += ' 1 month'
+		else string += ' '+months+' months'
+		if (days >= 1){
+			string += ' and'
+			if (days == 1) string += ' 1 day'
+			else string += ' '+days+' days'
+		}
+		string += ' ago'
+		return string
+	}
+	if (days >= 1){
+		
+		if (days == 1) string += ' 1 day'
+		else string += ' '+days+' days'
+		if (hours >= 1){
+			string += ' and'
+			if (hours == 1) string += ' 1 hour'
+			else string += ' '+hours+' hours'
+		}
+		string += ' ago'
+		return string
+	}
+	
+	if (hours >= 1){
+		
+		if (hours == 1) string += ' 1 hour'
+		else string += ' '+hours+' hours'
+		if (minutes >= 1){
+			string += ' and'
+			if (minutes == 1) string += ' 1 minute'
+			else string += ' '+minutes+' minutes'
+		}
+		string += ' ago'
+		return string
+	}
+	
+	if (minutes >= 1){
+		
+		if (minutes == 1) string += ' 1 minute'
+		else string += ' '+minutes+' minutes'
+		string += ' ago'
+		return string
+	}
+	
+	return 'Last seen less than 1 minute ago'
+	
+}
+		
 // Make a call to the API
 // callback(err, data) will be called when done
 function request(action, body, callback) {
@@ -143,8 +284,10 @@ function request(action, body, callback) {
 		
 		if (response.success)
 			callback(null, response.data)
-		else
+		else {
+			localStorage.removeItem('wiir-password')
 			callback(new Error('API returned error'))
+		}
 	}
 	ajax.onerror = function (err)  {
 		callback(err)

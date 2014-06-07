@@ -1,17 +1,38 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<title>WIIR</title>
 	<link rel="stylesheet" href="css.css">
 	<script src="js.js"></script>
+	<link rel="icon" href="img/home_32.png">
+	<meta name="viewport" content="width=device-width, user-scalable=no">
 </head>
 
 <body>
-	<h1>WIIR</h1>
-	<h2>People <label><input type="checkbox" id="show-all-people"> Show all</label></h2>
-	<div id="people"></div>
-	<h2>Unknown <label><input type="checkbox" id="show-all-unknown"> Show all</label></h2>
-	<div id="unknown"></div>
+	<h1><img src="img/home_32.png"> WIIR</h1>
+	<form id="login">
+		<p>Password:
+			<input type="password" id="password">
+		</p>
+		<p>
+			<label>
+				<input type="checkbox" id="remember">Remember</label>
+		</p>
+		<p>
+			<input type="submit" value="Login">
+		</p>
+	</form>
+
+	<h2 class="people"><img src="img/user_blue_32.png"> People</h2>
+	<div id="peopleList"></div>
+
+	<h2 class="offline"><img src="img/user_32.png"> Offline</h2>
+	<div id="offlineList"></div>
+
+	<h2 class="unknown"><img src="img/user_warning_32.png"> Unknown</h2>
+	<div id="unknownList"></div>
 </body>
+
 </html>
