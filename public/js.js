@@ -34,9 +34,20 @@ function get(id) {
 	return document.getElementById(id)
 }
 
-// Alias for document.createElement
-function create(tag) {
-	return document.createElement(tag)
+// Create and return a new HTML element
+// tag is a string with the tag name and optional class names, like: 'div.button.red'
+// Content is a string witht the text content (optional)
+function create(tag, content) {
+	var parts = tag.split('.'),
+		el = document.createElement(parts[0]),
+		i
+	for (i = 1; i < parts.length; i++) {
+		el.classList.add(parts[i])
+	}
+	if (content) {
+		el.textContent = content
+	}
+	return el
 }
 
 // Start the interface
@@ -128,27 +139,16 @@ function updateOnline(people) {
 	el.innerHTML = ''
 
 	people.forEach(function (person) {
-		var personEl = create('div')
-		personEl.className = 'person'
+		var personEl = create('div.person')
 		el.appendChild(personEl)
-
-		var nameEl = create('div')
-		nameEl.className = 'name'
-		nameEl.textContent = person.name
-		personEl.appendChild(nameEl)
+		personEl.appendChild(create('div.name', person.name))
 
 		person.devices.forEach(function (device) {
-			var deviceEl = create('div'),
-				spanEl
-			deviceEl.className = 'device'
+			var deviceEl = create('div.device', device.name)
 			deviceEl.classList.add(deviceTypeMap[device.type] + '-' + (device.on ? 'on' : 'off'))
-			deviceEl.textContent = device.name
 
 			if (device.lastSeen && !device.on) {
-				spanEl = create('span')
-				spanEl.className = 'last-seen'
-				spanEl.textContent = lastSeenEnhance(device.lastSeen)
-				deviceEl.appendChild(spanEl)
+				deviceEl.appendChild(create('span.last-seen', lastSeenEnhance(device.lastSeen)))
 			}
 
 			personEl.appendChild(deviceEl)
@@ -162,26 +162,18 @@ function updateOffline(people) {
 	el.innerHTML = ''
 
 	people.forEach(function (person) {
-		var personEl = create('div')
-		personEl.className = 'person'
+		var personEl = create('div.person'),
+			nameEl = create('div.name', person.name)
 		el.appendChild(personEl)
-
-		var nameEl = create('div')
-		nameEl.className = 'name'
-		nameEl.textContent = person.name
 		personEl.appendChild(nameEl)
 
 		person.devices.forEach(function (device) {
-			var deviceEl = create('span')
-			deviceEl.className = 'icon-' + deviceTypeMap[device.type] + '-off'
+			var deviceEl = create('span.icon-' + deviceTypeMap[device.type] + '-off')
 			nameEl.appendChild(deviceEl)
 		})
 
 		if (person.lastSeen) {
-			var lastSeenEl = create('div')
-			lastSeenEl.className = 'last-seen'
-			lastSeenEl.textContent = lastSeenEnhance(person.lastSeen)
-			personEl.appendChild(lastSeenEl)
+			personEl.appendChild(create('div.last-seen', lastSeenEnhance(person.lastSeen)))
 		}
 	})
 }
@@ -192,19 +184,11 @@ function updateUnknown(devices) {
 	el.innerHTML = ''
 
 	devices.forEach(function (device) {
-		var deviceEl = create('div')
-		deviceEl.className = 'person'
+		var deviceEl = create('div.person')
+		deviceEl.appendChild(create('div.name', device.name))
+		deviceEl.appendChild(create('div.mac', device.mac))
+
 		el.appendChild(deviceEl)
-
-		var nameEl = create('div')
-		nameEl.className = 'name'
-		nameEl.textContent = device.name
-		deviceEl.appendChild(nameEl)
-
-		var macEl = create('div')
-		macEl.className = 'mac'
-		macEl.textContent = device.mac
-		deviceEl.appendChild(macEl)
 	})
 }
 
