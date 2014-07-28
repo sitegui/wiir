@@ -50,6 +50,11 @@ function create(tag, content) {
 	return el
 }
 
+// Alias for document.createTextNode
+function text(str) {
+	return document.createTextNode(str)
+}
+
 // Start the interface
 // Called after password has been set
 function init() {
@@ -184,12 +189,63 @@ function updateUnknown(devices) {
 	el.innerHTML = ''
 
 	devices.forEach(function (device) {
-		var deviceEl = create('div.person')
+		var deviceEl = create('div.person'),
+			saveEl = create('input.save')
+		saveEl.type = 'button'
+		saveEl.value = 'Save person'
+		saveEl.onclick = function () {
+			savePerson(device.mac, saveEl)
+		}
+
 		deviceEl.appendChild(create('div.name', device.name))
 		deviceEl.appendChild(create('div.mac', device.mac))
+		deviceEl.appendChild(saveEl)
 
 		el.appendChild(deviceEl)
 	})
+}
+
+// Open the save person dialog
+// mac is a string
+// el is the HTML element that will be replaced by the form
+function savePerson(mac, el) {
+	var form = create('form.save'),
+		nameEl = create('input'),
+		typeEl = create('select'),
+		saveEl = create('input'),
+		type
+
+	for (type in deviceTypeMap) {
+		typeEl.appendChild(create('option', type))
+	}
+	saveEl.type = 'submit'
+	saveEl.value = 'Save'
+	form.onsubmit = function (event) {
+		event.preventDefault()
+		form.textContent = 'Saving...'
+		request('savePerson', {
+			mac: mac,
+			name: nameEl.value,
+			type: typeEl.value
+		}, function (err) {
+			if (err) {
+				console.error(err)
+				return alert('Failed')
+			}
+			window.location.reload()
+		})
+	}
+
+	form.appendChild(text('Person name: '))
+	form.appendChild(nameEl)
+	form.appendChild(create('br'))
+	form.appendChild(text('Device type: '))
+	form.appendChild(typeEl)
+	form.appendChild(create('br'))
+	form.appendChild(saveEl)
+	el.parentNode.replaceChild(form, el)
+
+	nameEl.focus()
 }
 
 // Returns a human readable string of the time the user was offline

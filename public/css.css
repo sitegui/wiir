@@ -1,8 +1,10 @@
 /* Global */
+
 * {
 	box-sizing: border-box;
 }
-html, body {
+html,
+body {
 	margin: 0;
 	background-color: #EEE;
 }
@@ -14,8 +16,8 @@ h2 {
 	padding: 5px;
 	margin: 0;
 }
-
 /* General */
+
 h2 + .person {
 	border-top: thin gray solid;
 }
@@ -39,21 +41,21 @@ h2 + .person {
 	color: #333;
 	display: block;
 }
-
 /* Online */
+
 h2.people {
 	background-color: #CCF;
 }
-
 /* Offline */
+
 h2.offline {
 	background-color: #CCC;
 }
 .person > .last-seen {
 	padding-left: 25px;
 }
-
 /* Unknown */
+
 h2.unknown {
 	background-color: #FCC;
 }
@@ -63,8 +65,11 @@ h2.unknown {
 	font-size: smaller;
 	padding-left: 25px;
 }
-
+.save {
+	margin: 10px;
+}
 /* Icons */
+
 .icon-computer-on,
 .icon-computer-off,
 .icon-ipad-on,
@@ -81,27 +86,35 @@ h2.unknown {
 	background-size: contain;
 	margin-left: 5px;
 }
-.icon-computer-on, .computer-on {
+.icon-computer-on,
+.computer-on {
 	background-image: url(img/computer_on.png);
 }
-.icon-computer-off, .computer-off {
+.icon-computer-off,
+.computer-off {
 	background-image: url(img/computer_off.png);
 }
-.icon-ipad-on, .ipad-on {
+.icon-ipad-on,
+.ipad-on {
 	background-image: url(img/ipad_on.png);
 }
-.icon-ipad-off, .ipad-off {
+.icon-ipad-off,
+.ipad-off {
 	background-image: url(img/ipad_off.png);
 }
-.icon-iphone-on, .iphone-on {
+.icon-iphone-on,
+.iphone-on {
 	background-image: url(img/iphone_on.png);
 }
-.icon-iphone-off, .iphone-off {
+.icon-iphone-off,
+.iphone-off {
 	background-image: url(img/iphone_off.png);
 }
-.icon-phone-on, .phone-on {
+.icon-phone-on,
+.phone-on {
 	background-image: url(img/phone_on.png);
 }
-.icon-phone-off, .phone-off {
+.icon-phone-off,
+.phone-off {
 	background-image: url(img/phone_off.png);
 }
