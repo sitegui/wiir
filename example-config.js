@@ -10,19 +10,19 @@ module.exports = {
 		password: 'router-pass',
 		command: 'lanhosts show all'
 	},
-	
+
 	// Router access timeout
 	timeout: 10e3,
-	
+
 	// Refresh interval
 	refresh: 600e3,
-	
+
 	// Public interface port
 	port: 81,
-	
+
 	// API password
 	password: 'api-pass',
-	
+
 	// Key and certificate (for https)
 	// Leave blank to use basic http
 	// Note: the password is sent in the clear,
