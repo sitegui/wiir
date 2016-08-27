@@ -8,8 +8,8 @@
 		"url": "https://github.com/sitegui/wiir"
 	},
 	"dependencies": {
-		"express": "~4.13.4",
-		"body-parser": "~1.14.2"
+		"express": "~4.14.0",
+		"body-parser": "~1.15.2"
 	},
 	"engines": {
 		"node": ">=4.2"
